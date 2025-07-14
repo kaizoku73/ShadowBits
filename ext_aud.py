@@ -1,8 +1,8 @@
 import wave
 from emb_aud import valid_wav
-from Crypto.Cipher import AES
-from crypto.aes import derive_key
+from crypto.aes import *
 import os
+import random
 
 def extract_audio(stego_path, output_path, key, decrypt=False):
 
@@ -13,10 +13,15 @@ def extract_audio(stego_path, output_path, key, decrypt=False):
         with wave.open(stego_path, 'rb') as song:
             frame_bytes = song.readframes(song.getnframes())
 
-        ### Extracts Last bits of every byte
+        ### Extracts Last bits of randomized byte
+        seed = to_seed(key)
+        shifu = random.Random(seed)
+        indexes = list(range(len(frame_bytes)))
+        shifu.shuffle(indexes)
+
         extracted_bits = []
-        for byte in frame_bytes:
-            extracted_bits.append(byte & 1)
+        for i in indexes:
+            extracted_bits.append(frame_bytes[i] & 1)
 
         ### convert bits back to bytes
         extracted_bytes = bytearray()
@@ -35,7 +40,7 @@ def extract_audio(stego_path, output_path, key, decrypt=False):
         try:
             start_byte = extracted_bytes.find(starting)
             if start_byte == -1:
-                raise ValueError("Starting point not found - file may not contain embedded data")
+                raise ValueError("Starting point not found - file may not contain embedded data or key is incorrect")
             
             search = start_byte + len(starting)
             end_byte = extracted_bytes.find(ending, search)
@@ -50,18 +55,8 @@ def extract_audio(stego_path, output_path, key, decrypt=False):
         
         ### Decrypt if provided encryption duting embedding
         if decrypt:
-            try:
-                nonce = payload[:16]
-                tag = payload[16:32]
-                ciphertext = payload[32:]
-                cipher = AES.new(derive_key(key), AES.MODE_EAX, nonce=nonce)
-                payload = cipher.decrypt_and_verify(ciphertext, tag)
-
-            except Exception as e:
-                print(f"Decryption failed : {e}")
-                return None
+            payload = decryption(payload, key)
             
-
         ### create out file
         if os.path.exists(output_path):
             name, ext = os.path.splitext(output_path)
@@ -75,7 +70,6 @@ def extract_audio(stego_path, output_path, key, decrypt=False):
         with open(output_path, 'wb') as fd:
             fd.write(payload)
 
-        print(f"Successfully extracted {len(payload)} bytes to {output_path}")
         return payload
     
     except Exception as e:

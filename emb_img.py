@@ -1,22 +1,19 @@
 from PIL import Image
 import random
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-from crypto.aes import derive_key
+from crypto.aes import *
 import os
 
-### To varify if the iamge is valid
+### To varify if the image is valid
 def valid_img(cover_path):
     try:
         with Image.open(cover_path) as img:
             img.verify()
-        return True
+            format = img.format
+        return format.upper() == "PNG"
     except Exception:
         return False
 
-def embed_file(cover_path, payload_path, out_path, key=None, encrypt=False):
-
-    out = random.randint(13478329543, 999999999999)
+def embed_file(cover_path, payload_path, out_path, key, encrypt=False):
     temp = None
 
     try:
@@ -25,7 +22,7 @@ def embed_file(cover_path, payload_path, out_path, key=None, encrypt=False):
         if not os.path.exists(payload_path):
             raise FileNotFoundError(f"Payload file {payload_path} not found.")
         if not valid_img(cover_path):
-            raise ValueError(f"{cover_path} is not a valid image file.")
+            raise ValueError(f"{cover_path} is not a valid PNG image file.")
         
         temp_id = random.randint(12345678, 999999999)
         temp = f"temp_img_{temp_id}.png"
@@ -50,9 +47,7 @@ def embed_file(cover_path, payload_path, out_path, key=None, encrypt=False):
             payload = f.read()
 
         if encrypt:
-            cipher = AES.new(derive_key(key), AES.MODE_EAX)
-            ciphertext, tag = cipher.encrypt_and_digest(payload)
-            payload = cipher.nonce + tag + ciphertext
+            payload = encryption(payload, key)
 
         starting = b'###START###'
         ending = b'###END###'
@@ -66,7 +61,8 @@ def embed_file(cover_path, payload_path, out_path, key=None, encrypt=False):
         if len(bits) > max_bits:
             raise ValueError('Payload too large to embed in cover image.')
 
-        prng = random.Random(key)
+        seed = to_seed(key)
+        prng = random.Random(seed)
         indexes = list(range(len(pixels)))
         prng.shuffle(indexes)
 

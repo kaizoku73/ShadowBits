@@ -1,7 +1,7 @@
 import argparse
 from emb_img import embed_file  
 from ext_img import extract_file
-from emb_aud import combine
+from emb_aud import embed_audio
 from ext_aud import extract_audio
 
 
@@ -50,16 +50,16 @@ if __name__ == '__main__':
     try:
         if args.command == 'img-embed':
             embed_file(args.image, args.input, args.out, args.key, args.encrypt)
-            print(f"Successfully embedded {args.input} in {args.image} -> {args.out}")
+            print(f"Successfully embedded {args.input} in {args.image}.")
         elif args.command == 'img-extract':
             extract_file(args.stego, args.out, args.key, args.decrypt)
-            print(f"Successfully extracted hidden file from {args.stego} -> {args.out}")
+            print(f"Successfully extracted hidden file from {args.stego}.")
         elif args.command == 'aud-embed':
-            combine(args.song, args.input, args.out, args.key, args.encrypt)
-            print(f"Successfully embedded {args.input} in {args.song} -> {args.out}")
+            embed_audio(args.song, args.input, args.out, args.key, args.encrypt)
+            print(f"Successfully embedded {args.input} in {args.song}.")
         elif args.command == 'aud-extract':
             extract_audio(args.stego, args.out, args.key, args.decrypt)
-            print(f"Successfully extracted hidden file from {args.stego} -> {args.out}")
+            print(f"Successfully extracted hidden file from {args.stego}.")
 
     except Exception as e:
         print(f"Error: {e}")

@@ -1,20 +1,22 @@
 from PIL import Image
 import random
-from Crypto.Cipher import AES
-from crypto.aes import derive_key
+from crypto.aes import *
 import os
+from emb_img import valid_img
 
-def extract_file(stego_path, out_path, key=None, decrypt=False):
+def extract_file(stego_path, out_path, key, decrypt=False):
 
     try:
         if not os.path.exists(stego_path):
             raise FileNotFoundError(f"stego image {stego_path} not found.")
+        if not valid_img(stego_path):
+            raise ValueError(f"Image is not a valid PNG file.")
         
         img = Image.open(stego_path)
         pixels = list(img.getdata())
         
-
-        prng = random.Random(key)
+        seed = to_seed(key)
+        prng = random.Random(seed)
         indexes = list(range(len(pixels)))
         prng.shuffle(indexes)
 
@@ -37,7 +39,7 @@ def extract_file(stego_path, out_path, key=None, decrypt=False):
 
         start_point = bytes_list.find(starting)
         if start_point == -1:
-            raise ValueError("Starting point of the payload not found in image")
+            raise ValueError("Starting point of the payload not found in image or key is incorrect")
         
         data_start = start_point + len(starting)
 
@@ -67,16 +69,7 @@ def extract_file(stego_path, out_path, key=None, decrypt=False):
         
         ### decryption
         if decrypt:
-            if len(payload) < 32:
-                raise ValueError("Encrypted payload too short")
-            nonce = payload[:16]
-            tag = payload[16:32]
-            ciphertext = payload[32:]
-            cipher = AES.new(derive_key(key), AES.MODE_EAX, nonce=nonce)
-            try:
-                payload = cipher.decrypt_and_verify(ciphertext, tag)
-            except ValueError as e:
-                raise ValueError("Decryption failed - wrong key or corrupted data")
+            payload = decryption(payload, key)
             
         if os.path.exists(out_path):
             name, ext = os.path.splitext(out_path)
