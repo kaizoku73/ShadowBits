@@ -2,20 +2,23 @@ from PIL import Image
 import random
 from crypto.aes import *
 import os
+import time
 
 ### To varify if the image is valid
 def valid_img(cover_path):
     try:
         with Image.open(cover_path) as img:
-            img.verify()
-            format = img.format
-        return format.upper() == "PNG"
+            # Check format first
+            if img.format and img.format.upper() == "PNG":
+                img.verify()  # Only verify if it claims to be PNG
+                return True
+            return False
     except Exception:
         return False
 
-def embed_file(cover_path, payload_path, out_path, key, encrypt=False):
-    temp = None
 
+def embed_file(cover_path, payload_path, key):
+    start = time.time()
     try:
         if not os.path.exists(cover_path):
             raise FileNotFoundError(f"Cover image {cover_path} not found.")
@@ -23,43 +26,38 @@ def embed_file(cover_path, payload_path, out_path, key, encrypt=False):
             raise FileNotFoundError(f"Payload file {payload_path} not found.")
         if not valid_img(cover_path):
             raise ValueError(f"{cover_path} is not a valid PNG image file.")
-        
-        temp_id = random.randint(12345678, 999999999)
-        temp = f"temp_img_{temp_id}.png"
 
-        try:
-            with Image.open(cover_path) as img:
-                img.save(temp, 'PNG')
-            cover = temp
-        except Exception as e:
-            raise ValueError(f"Error converting cover image to PNG : {e}")
-            
-
-        img = Image.open(cover)
+        print("Loading cover file...")
+        img = Image.open(cover_path)
         mode = img.mode
 
         if mode != 'RGB':
+            print(f"Converting the {mode} mode to RGB mode...")
             img = img.convert('RGB')
 
         pixels = list(img.getdata())
 
+        print("Loading payload file in bytes...")
         with open(payload_path, 'rb') as f:
             payload = f.read()
 
-        if encrypt:
-            payload = encryption(payload, key)
+        print("Encrypting the payload bytes...")
+        payload = encryption(payload, key)
 
+        print("Attaching the markers on payload bytes...")
         starting = b'###START###'
         ending = b'###END###'
 
         length = len(payload).to_bytes(4, 'big')
         data = starting + length + payload + ending
 
+        print("Convertng payload bytes into bits...")
         bits = ''.join(f'{byte:08b}' for byte in data)
 
         max_bits = len(pixels) * 3 ### 3 color channels per pixel
+        print("Checking cover file capacity...")
         if len(bits) > max_bits:
-            raise ValueError('Payload too large to embed in cover image.')
+            raise ValueError('Payload is too large to embed in cover file.')
 
         seed = to_seed(key)
         prng = random.Random(seed)
@@ -86,24 +84,20 @@ def embed_file(cover_path, payload_path, out_path, key, encrypt=False):
 
             new_pixels[pixel_idx] = (r, g, b)
 
-        if os.path.exists(out_path):
-            name, ext = os.path.splitext(out_path)
-            counter = 1
-            while os.path.exists(f"{name}_{counter}{ext}"):
-                counter += 1
-            out_path = f"{name}_{counter}{ext}"
-
         img.putdata(new_pixels)
-        img.save(out_path)
 
-        return out_path
+        output_path = "stego_file.png"
+        if os.path.exists(output_path):
+            counter = 1
+            while os.path.exists(f"stego_file({counter}).png"):
+                counter += 1
+            output_path = f"stego_file({counter}).png"
+            
+        print("Saving the stego file...")
+        file = img.save(output_path)
+        end = time.time() - start
+        print(f"Time taken: {int(end)} seconds.")
+        return file
     except Exception as e:
         print(f"Error in embedding : {e}")
         raise
-
-    finally:
-        if temp and os.path.exists(temp):
-            try:
-                os.remove(temp)
-            except Exception as e:
-                print(f"Could not remove the temporary file {temp} : {e}")

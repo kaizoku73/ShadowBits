@@ -8,15 +8,17 @@ A powerful steganography tool that allows you to hide files within images and au
 - **Audio Steganography**: Embed files in WAV audio files 
 - **AES Encryption**: Optional encryption layer for embedded data
 - **Key-based Randomization**: Uses secret keys to randomize bit placement for enhanced security
-- **Multiple Format Support**: Automatically converts audio files to WAV format when needed
+- **Automatic File Type Detection**: Detects and preserves original file types during extraction
+- **Format Validation**: Validates PNG images and WAV audio files before processing
 - **Collision Prevention**: Automatically handles filename conflicts during output
+- **Comprehensive Error Handling**: Robust error handling for various failure scenarios
 
 ## Installation
 
 ### Prerequisites
 
 ```bash
-pip install pillow pycryptodome ffmpeg-python
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -27,44 +29,25 @@ ShadowBits provides a command-line interface with four main operations:
 
 #### Embed a file in an image
 ```bash
-python cli.py img-embed --in secret.txt --cover image.png --out stego_image.png --key mysecretkey
-```
-
-#### Embed with encryption
-```bash
-python cli.py img-embed --in secret.txt --cover image.png --out stego_image.png --key mysecretkey --encrypt
+python cli.py img-embed --in secret.txt --cover image.png --key mysecretkey
 ```
 
 #### Extract from image
 ```bash
-python cli.py img-extract --stego stego_image.png --out extracted.txt --key mysecretkey
+python cli.py img-extract --stego stego_image.png --key mysecretkey
 ```
 
-#### Extract with decryption
-```bash
-python cli.py img-extract --stego stego_image.png --out extracted.txt --key mysecretkey --decrypt
-```
 
 ### Audio Operations
 
 #### Embed a file in audio
 ```bash
-python cli.py aud-embed --in secret.pdf --cover music.mp3 --out stego_audio.wav --key myaudiokey
-```
-
-#### Embed with encryption
-```bash
-python cli.py aud-embed --in secret.pdf --cover music.mp3 --out stego_audio.wav --key myaudiokey --encrypt
+python cli.py aud-embed --in secret.pdf --cover music.wav --key myaudiokey
 ```
 
 #### Extract from audio
 ```bash
-python cli.py aud-extract --stego stego_audio.wav --out extracted.pdf --key myaudiokey
-```
-
-#### Extract with decryption
-```bash
-python cli.py aud-extract --stego stego_audio.wav --out extracted.pdf --key myaudiokey --decrypt
+python cli.py aud-extract --stego stego_audio.wav --key myaudiokey
 ```
 
 ## How It Works
@@ -72,48 +55,60 @@ python cli.py aud-extract --stego stego_audio.wav --out extracted.pdf --key myau
 ### LSB Steganography
 ShadowBits uses the Least Significant Bit (LSB) method to hide data:
 
-- **Images**: Modifies the least significant bit of RGB color channels
-- **Audio**: Alters the least significant bit of audio sample data
+- **Images**: Modifies the least significant bit of RGB color channels in a randomized order
+- **Audio**: Modifies the least significant bit of audio sample data in a randomized pattern
 
 ## What is LSB and how does it work?
-Article coming soon
+For a detailed explanation of LSB steganography and how it works, check out this article: https://kaizoku.gitbook.io/steganography
 
 ### Security Features
 
 1. **Key-based Randomization**: Uses PRNG seeded with your secret key to randomize bit placement
-2. **AES Encryption**: Optional AES-EAX encryption with key derivation
-3. **Data Integrity**: Uses start/end markers to ensure data completeness
-4. **Format Validation**: Verifies file formats before processing
+2. **Automatic AES Encryption**: All data is encrypted using AES-EAX mode with SHA-256 key derivation
+3. **Data Integrity Markers**: Uses start/end markers to ensure data completeness
+4. **Format Validation**: Verifies PNG/WAV file formats before processing
+5. **File Type Detection**: Automatically detects original file type using magic bytes for proper restoration
+
+## Hidden Files
+The tool can hide any file type and will automatically detect and restore the original format using magic byte signatures, including:
+- Images: JPG, PNG, GIF, BMP, WebP, ICO
+- Documents: PDF, DOC, ZIP archives
+- Audio: MP3, OGG, FLAC, WAV
+- Video: MP4, M4V, AVI
+- Archives: ZIP, GZ, RAR, 7Z
+- Text/Code: HTML, XML, Python, C, JavaScript, plain text
+- Binary files: Any other format as .bin
+
 
 ## Limitations
 
 - **Image capacity**: Limited by image size (3 bits per pixel for RGB images)
 - **Audio capacity**: Limited by audio file length (1 bit per sample)
-- **Audio format**: Output audio files are always in WAV format
 - **File size**: To hide larger files, you need larger cover media file
 
 ## Examples
 
 ### Hide a document in a photo
 ```bash
-python cli.py img-embed --in document.pdf --cover vacation.jpg --out innocent_photo.png --key family2023 --encrypt
+python cli.py img-embed --in document.pdf --cover vacation.jpg --key family2023
 ```
 
 ### Extract the hidden document
 ```bash
-python cli.py img-extract --stego innocent_photo.png --out recovered_document.pdf --key family2023 --decrypt
+python cli.py img-extract --stego stego_file.png --key family2023
 ```
 
 ### Hide source code in music
 ```bash
-python cli.py aud-embed --in source_code.zip --cover favorite_song.mp3 --out normal_audio.wav --key coding123
+python cli.py aud-embed --in source_code.zip --cover favorite_song.mp3 --key coding123
 ```
 
 ## Security Considerations
 
 - **Key Management**: Use strong, unique keys for each operation
-- **Cover Selection**: Choose cover files with sufficient capacity
-- **Encryption**: Always use `--encrypt` for sensitive data
+- **Key Security**: The same key is used for both encryption and randomization
+- **Cover Selection**: Choose cover files with sufficient capacity for your payload
+- **File Format**: Ensure cover images are PNG and audio files are WAV
 - **Key Reuse**: Avoid reusing keys across different files
 
 ## Error Handling
@@ -121,8 +116,8 @@ python cli.py aud-embed --in source_code.zip --cover favorite_song.mp3 --out nor
 ShadowBits includes comprehensive error handling for:
 - Invalid file formats
 - Insufficient cover media capacity  
-- Corrupted embedded data
-- Decryption failures
+- Corrupted embedded data or invalid markers
+- AES Decryption failures (wrong key or corrupted data)
 - Missing files or permissions
 
 ## Contributing

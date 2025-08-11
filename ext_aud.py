@@ -3,27 +3,30 @@ from emb_aud import valid_wav
 from crypto.aes import *
 import os
 import random
+from validator import detect_file_type
+import time
 
-def extract_audio(stego_path, output_path, key, decrypt=False):
-
+def extract_audio(stego_path, key):
+    start = time.time()
     try:
         if not valid_wav(stego_path):
             raise ValueError(f"{stego_path} is not a valid wav file")
         
+        print("Loading stego file...")
         with wave.open(stego_path, 'rb') as song:
             frame_bytes = song.readframes(song.getnframes())
 
-        ### Extracts Last bits of randomized byte
         seed = to_seed(key)
         shifu = random.Random(seed)
         indexes = list(range(len(frame_bytes)))
         shifu.shuffle(indexes)
 
+        print("Extracting the bits from stego file...")
         extracted_bits = []
         for i in indexes:
             extracted_bits.append(frame_bytes[i] & 1)
 
-        ### convert bits back to bytes
+        print("Converting extracted bits into bytes...")
         extracted_bytes = bytearray()
         for i in range(0, len(extracted_bits), 8):
             if i + 7 < len(extracted_bits):
@@ -33,10 +36,9 @@ def extract_audio(stego_path, output_path, key, decrypt=False):
                     byte_value |= bit << (7-j)
                 extracted_bytes.append(byte_value)
 
-        ### find starting and ending of the embedded payload
         starting = b'###START###'
         ending = b'###END###'
-
+        print("Locating markers in bytes...")
         try:
             start_byte = extracted_bytes.find(starting)
             if start_byte == -1:
@@ -47,29 +49,24 @@ def extract_audio(stego_path, output_path, key, decrypt=False):
             if end_byte == -1:
                 raise ValueError("Ending point not found - embedded data maybe corrupted")
             
+            print("Extracting payload's bytes from bytes....")
             payload = bytes(extracted_bytes[search:end_byte])
 
         except Exception as e:
-            print(f"Error finding hidden data : {e}")
+            print(f"Error finding payload data : {e}")
             return None
         
-        ### Decrypt if provided encryption duting embedding
-        if decrypt:
-            payload = decryption(payload, key)
+        print("Decrypting the payload's bytes...")
+        payload = decryption(payload, key)
             
-        ### create out file
-        if os.path.exists(output_path):
-            name, ext = os.path.splitext(output_path)
-            counter = 1
-            while os.path.exists(f"{name}_{counter}{ext}"):
-                counter += 1
+        extension, mime_type = detect_file_type(payload)
+        output_path = f"hidden_file.{extension}"
 
-            output_path = f"{name}_{counter}{ext}"
-
-        ### save the payload
+        print("Saving the extracted file...")
         with open(output_path, 'wb') as fd:
             fd.write(payload)
-
+        end = time.time() - start
+        print(f"Time taken: {int(end)} seconds.")
         return payload
     
     except Exception as e:
