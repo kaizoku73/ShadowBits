@@ -110,17 +110,17 @@ The tool can hide any file type and will automatically detect and restore the or
 
 ### Hide a document in a photo
 ```bash
-shadowbits img-embed --in document.pdf --cover vacation.jpg --key family2023
+shadowbits img embed --in document.pdf --cover vacation.jpg --key family2023
 ```
 
 ### Extract the hidden document
 ```bash
-shadowbits img-extract --stego stego_file.png --key family2023
+shadowbits img extract --stego stego_file.png --key family2023
 ```
 
 ### Hide source code in music
 ```bash
-shadowbits aud-embed --in source_code.zip --cover favorite_song.mp3 --key coding123
+shadowbits aud embed --in source_code.zip --cover favorite_song.mp3 --key coding123
 ```
 
 ## Security Considerations
