@@ -126,7 +126,7 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 
 ## License
 
-This project is open source, feel free to use and modify it. Just don't forget to credit me if you share it!
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Disclaimer
 
