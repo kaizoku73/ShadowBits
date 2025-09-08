@@ -30,6 +30,17 @@ curl -sSL https://raw.githubusercontent.com/kaizoku73/ShadowBits/main/install.sh
 curl -sSL https://raw.githubusercontent.com/kaizoku73/ShadowBits/main/install.sh | bash
 ```
 
+### Uninstallation
+
+```bash
+# To uninstall Resono (no sudo):
+curl -sSL https://raw.githubusercontent.com/kaizoku73/ShadowBits/main/uninstall.sh | bash
+
+# To uninstall Resono (With sudo):
+curl -sSL https://raw.githubusercontent.com/kaizoku73/ShadowBits/main/uninstall.sh | sudo bash
+
+```
+
 ## Usage
 
 ShadowBits provides a command-line interface with four main operations:
@@ -38,12 +49,12 @@ ShadowBits provides a command-line interface with four main operations:
 
 #### Embed a file in an image
 ```bash
-python cli.py img embed --in secret.txt --cover image.png --key mysecretkey
+shadowbits img embed --in secret.txt --cover image.png --key mysecretkey
 ```
 
 #### Extract from image
 ```bash
-python cli.py img extract --stego stego_image.png --key mysecretkey
+shadowbits img extract --stego stego_image.png --key mysecretkey
 ```
 
 
@@ -51,12 +62,12 @@ python cli.py img extract --stego stego_image.png --key mysecretkey
 
 #### Embed a file in audio
 ```bash
-python cli.py aud embed --in secret.pdf --cover music.wav --key myaudiokey
+shadowbits aud embed --in secret.pdf --cover music.wav --key myaudiokey
 ```
 
 #### Extract from audio
 ```bash
-python cli.py aud extract --stego stego_audio.wav --key myaudiokey
+shadowbits aud extract --stego stego_audio.wav --key myaudiokey
 ```
 
 ## How It Works
@@ -99,17 +110,17 @@ The tool can hide any file type and will automatically detect and restore the or
 
 ### Hide a document in a photo
 ```bash
-python cli.py img-embed --in document.pdf --cover vacation.jpg --key family2023
+shadowbits img-embed --in document.pdf --cover vacation.jpg --key family2023
 ```
 
 ### Extract the hidden document
 ```bash
-python cli.py img-extract --stego stego_file.png --key family2023
+shadowbits img-extract --stego stego_file.png --key family2023
 ```
 
 ### Hide source code in music
 ```bash
-python cli.py aud-embed --in source_code.zip --cover favorite_song.mp3 --key coding123
+shadowbits aud-embed --in source_code.zip --cover favorite_song.mp3 --key coding123
 ```
 
 ## Security Considerations
