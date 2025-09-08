@@ -20,6 +20,15 @@ A powerful steganography tool that allows you to hide files within images and au
 ```bash
 pip install -r requirements.txt
 ```
+### One-Line Installation
+
+```bash
+# System-wide (with sudo)
+curl -sSL https://raw.githubusercontent.com/kaizoku73/ShadowBits/main/install.sh | sudo bash
+
+# User installation (no sudo)
+curl -sSL https://raw.githubusercontent.com/kaizoku73/ShadowBits/main/install.sh | bash
+```
 
 ## Usage
 
