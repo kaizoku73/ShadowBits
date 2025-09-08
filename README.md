@@ -29,12 +29,12 @@ ShadowBits provides a command-line interface with four main operations:
 
 #### Embed a file in an image
 ```bash
-python cli.py img-embed --in secret.txt --cover image.png --key mysecretkey
+python cli.py img embed --in secret.txt --cover image.png --key mysecretkey
 ```
 
 #### Extract from image
 ```bash
-python cli.py img-extract --stego stego_image.png --key mysecretkey
+python cli.py img extract --stego stego_image.png --key mysecretkey
 ```
 
 
@@ -42,12 +42,12 @@ python cli.py img-extract --stego stego_image.png --key mysecretkey
 
 #### Embed a file in audio
 ```bash
-python cli.py aud-embed --in secret.pdf --cover music.wav --key myaudiokey
+python cli.py aud embed --in secret.pdf --cover music.wav --key myaudiokey
 ```
 
 #### Extract from audio
 ```bash
-python cli.py aud-extract --stego stego_audio.wav --key myaudiokey
+python cli.py aud extract --stego stego_audio.wav --key myaudiokey
 ```
 
 ## How It Works
@@ -59,7 +59,7 @@ ShadowBits uses the Least Significant Bit (LSB) method to hide data:
 - **Audio**: Modifies the least significant bit of audio sample data in a randomized pattern
 
 ## What is LSB and how does it work?
-For a detailed explanation of LSB steganography and how it works, check out this article: https://kaizoku.gitbook.io/steganography
+For a detailed explanation on LSB steganography and how it works, check out this article: https://kaizoku.gitbook.io/steganography
 
 ### Security Features
 
