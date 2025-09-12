@@ -1,0 +1,6 @@
+# Exclude files from releases/archives
+install.sh export-ignore
+uninstall.sh export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+.github/ export-ignore

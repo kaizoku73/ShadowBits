@@ -13,13 +13,19 @@ A powerful steganography tool that allows you to hide files within images and au
 - **Collision Prevention**: Automatically handles filename conflicts during output
 - **Comprehensive Error Handling**: Robust error handling for various failure scenarios
 
-## Installation
+## Quick Start
 
 ### Prerequisites
 
 ```bash
 pip install -r requirements.txt
 ```
+### Installation
+
+```bash
+pip install shadowbits
+```
+
 ### One-Line Installation
 
 ```bash

@@ -1,0 +1,24 @@
+# Include important documentation and license files
+include README.md
+include LICENSE
+include requirements.txt
+
+# Include all Python files in the shadowbits package
+recursive-include shadowbits *.py
+
+# Exclude development and build files
+exclude .gitignore
+exclude .gitattributes
+exclude install.sh
+exclude uninstall.sh
+exclude *.pyc
+exclude *~
+exclude .DS_Store
+
+# Exclude development directories
+recursive-exclude tests *
+recursive-exclude .git *
+recursive-exclude __pycache__ *
+recursive-exclude *.egg-info *
+global-exclude *.pyc
+global-exclude *~
