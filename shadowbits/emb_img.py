@@ -1,6 +1,6 @@
 from PIL import Image
 import random
-from crypto.aes import *
+from .crypto.aes import *
 import os
 import time
 

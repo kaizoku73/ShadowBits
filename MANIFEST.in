@@ -2,6 +2,7 @@
 include README.md
 include LICENSE
 include requirements.txt
+include MANIFEST.in
 
 # Include all Python files in the shadowbits package
 recursive-include shadowbits *.py

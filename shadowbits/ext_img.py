@@ -1,9 +1,9 @@
 from PIL import Image
 import random
-from crypto.aes import *
+from .crypto.aes import *
 import os
-from emb_img import valid_img
-from validator import detect_file_type
+from .emb_img import valid_img
+from .validator import detect_file_type
 import time
 
 def extract_file(stego_path, key):

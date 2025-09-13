@@ -1,8 +1,8 @@
 import argparse
-from emb_img import embed_file  
-from ext_img import extract_file
-from emb_aud import embed_audio
-from ext_aud import extract_audio
+from .emb_img import embed_file  
+from .ext_img import extract_file
+from .emb_aud import embed_audio
+from .ext_aud import extract_audio
 
 
 def main():

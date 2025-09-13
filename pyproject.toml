@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "shadowbits"
-version = "1.0.0"
+version = "1.0.1"
 description = "Powerful steganography tool for hiding files in images and audio using LSB techniques"
 readme = "README.md"
 requires-python = ">=3.7"

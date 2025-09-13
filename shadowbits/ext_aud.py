@@ -1,9 +1,9 @@
 import wave
-from emb_aud import valid_wav
-from crypto.aes import *
+from .emb_aud import valid_wav
+from .crypto.aes import *
 import os
 import random
-from validator import detect_file_type
+from .validator import detect_file_type
 import time
 
 def extract_audio(stego_path, key):
